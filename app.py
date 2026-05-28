@@ -1,7 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
 from PIL import Image
-import io
 
 # إعداد الربط
 api_key = st.secrets["GEMINI_API_KEY"]
@@ -15,33 +14,19 @@ uploaded_file = st.file_uploader("ارفع صورتك:", type=["jpg", "png", "jp
 if uploaded_file and st.button("نطحة مضحكة!"):
     with st.spinner('جاري تحليل صورتك...'):
         try:
-            # معالجة الصورة بشكل صحيح
+            # 1. فتح الصورة باستخدام PIL مباشرة
             img = Image.open(uploaded_file)
             
-            # تحويل الصورة إلى bytes لضمان عدم حدوث خطأ أثناء الإرسال
-            buf = io.BytesIO()
-            img.save(buf, format='JPEG')
-            byte_im = buf.getvalue()
+            # 2. إرسال الصورة مباشرة إلى Gemini (بدون تحويل معقد)
+            prompt = "صف مشهداً مضحكاً لخروف ينطح الشخص في هذه الصورة. اكتب وصفاً دقيقاً ومباشراً."
+            response = model.generate_content([prompt, img])
             
-            # تجهيز الطلب
-            image_parts = [
-                {
-                    "mime_type": "image/jpeg",
-                    "data": byte_im
-                }
-            ]
-            
-            prompt = "صف مشهداً مضحكاً جداً لخروف ينطح الشخص الموجود في الصورة، اكتب وصفاً قصيراً ومباشراً لاستخدامه في توليد صورة."
-            
-            # الاتصال بـ Gemini
-            response = model.generate_content([prompt, image_parts])
-            
-            # توليد الصورة
-            image_description = response.text.replace(" ", "%20")
-            image_url = f"https://image.pollinations.ai/prompt/{image_description}?width=512&height=512"
+            # 3. توليد الصورة
+            description = response.text.replace(" ", "%20")
+            image_url = f"https://image.pollinations.ai/prompt/{description}?width=512&height=512"
             
             st.image(image_url, caption="نطحة العيد!")
+            st.success("تم!")
             
         except Exception as e:
-            st.error(f"حدث خطأ: {e}")
-            st.write("تأكد أن مفتاح API في الـ Secrets صحيح ولا يحتوي على مسافات.")
+            st.error(f"حدث خطأ تقني: {e}")
