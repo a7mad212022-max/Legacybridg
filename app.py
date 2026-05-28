@@ -1,9 +1,14 @@
 import streamlit as st
 import google.generativeai as genai
 
-# هذه الخانة ستظهر في التطبيق ليتمكن المستخدم من وضع المفتاح
-api_key = st.sidebar.text_input("AIzaSyBzs_9BlEr9P_gIYgY8p9sBRD50tdqL91M", type="password")
+# البرنامج سيقرأ المفتاح تلقائياً من إعدادات المنصة
+api_key = st.secrets["AIzaSyBzs_9BlEr9P_gIYgY8p9sBRD50tdqL91M"]
+genai.configure(api_key=api_key)
 
-if api_key:
-    genai.configure(api_key=api_key)
-    st.success("تم ربط Gemini بنجاح!")
+st.title("🐑 برنامج النطحة المضحكة")
+
+uploaded_file = st.file_uploader("ارفع صورة شخص:", type=["jpg", "png"])
+
+if uploaded_file and st.button("اجعلها مضحكة!"):
+    st.success("تم الربط بنجاح! جاري معالجة الصورة...")
+    # هنا سيتم لاحقاً إضافة كود معالجة الصورة عبر Gemini
