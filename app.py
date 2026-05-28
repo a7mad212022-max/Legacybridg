@@ -5,7 +5,7 @@ from PIL import Image
 # إعداد Gemini
 api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-1.5-pro')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 st.title("🐑 برنامج النطحة المضحكة")
 
